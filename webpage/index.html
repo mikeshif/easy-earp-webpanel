@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset=utf-8 />
-  <title>Store Locator</title>
+  <title>EARP System</title>
   <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet'>
   <script src='https://api.tiles.mapbox.com/mapbox.js/v2.2.2/mapbox.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox.js/v2.2.2/mapbox.css' rel='stylesheet' />
@@ -30,11 +30,20 @@
   }
   a:hover { color:#101010; }
 
+  .legend {
+    position:absolute;
+    width:33.3333%;
+    height:20%;
+    top:0;left:0;
+    overflow:hidden;
+    padding:10px;
+    border-right:1px solid rgba(0,0,0,0.25);
+  }
   .sidebar {
     position:absolute;
     width:33.3333%;
-    height:100%;
-    top:0;left:0;
+    height:80%;
+    top:15%;left:0;
     overflow:hidden;
     border-right:1px solid rgba(0,0,0,0.25);
   }
@@ -71,12 +80,12 @@
   .listings .item:last-child { border-bottom:none; }
   .listings .item .title {
     display:block;
-    color:#00853e;
+    color:#c90909;
     font-weight:700;
   }
   .listings .item .title small { font-weight:400; }
   .listings .item.active .title,
-  .listings .item .title:hover { color:#8cc63f; }
+  .listings .item .title:hover { color:#9c563f; }
   .listings .item.active {
     background-color:#f8f8f8;
   }
@@ -91,7 +100,7 @@
     background:none;
   }
   ::-webkit-scrollbar-thumb {
-    background:#00853e;
+    background:#90853e;
     border-radius:0;
   }
 
@@ -117,7 +126,7 @@
     padding:0;
   }
   .leaflet-popup-content h3 {
-    background:#91c949;
+    background:#c90909;
     color:#fff;
     margin:0;
     display:block;
@@ -133,15 +142,308 @@
   </style>
 </head>
 <body>
+
+  <div class='legend'>
+   <h1>Filter for Time:</h1>
+   <select>
+       <option value="january">January</option>
+       <option value="february">February</option>
+       <option value="march">March</option>
+       <option value="april">April</option>
+       <option value="may">May</option>
+       <option value="june">June</option>
+       <option value="july">July</option>
+       <option value="august">August</option>
+       <option value="september">September</option>
+       <option value="october">October</option>
+       <option value="november">November</option>
+       <option value="december">December</option>
+   </select>
+
+   <select>
+       <option value="1">01</option>
+       <option value="2">02</option>
+       <option value="3">03</option>
+       <option value="14">14</option>
+       <option value="31">31</option>
+   </select>
+
+   <select>
+       <option value="2013">2013</option>
+       <option value="2014">2014</option>
+       <option value="2015">2015</option>
+       <option value="2016">2016</option>
+   </select>
+
+   <br>
+
+   <select>
+       <option value="january">January</option>
+       <option value="february">February</option>
+       <option value="march">March</option>
+       <option value="april">April</option>
+       <option value="may">May</option>
+       <option value="june">June</option>
+       <option value="july">July</option>
+       <option value="august">August</option>
+       <option value="september">September</option>
+       <option value="october">October</option>
+       <option value="november">November</option>
+       <option value="december">December</option>
+   </select>
+
+   <select>
+       <option value="1">01</option>
+       <option value="2">02</option>
+       <option value="3">03</option>
+       <option value="14">14</option>
+       <option value="31">31</option>
+   </select>
+
+   <select>
+       <option value="2013">2013</option>
+       <option value="2014">2014</option>
+       <option value="2015">2015</option>
+       <option value="2016">2016</option>
+   </select>
+   <br>
+<button type="button" id="button1"  onclick="submit();" >Submit</button>
+<button type="button" id="button2"  onclick="clearme();" >Clear</button>
+
+
+  </div>
+
   <div class='sidebar'>
     <div class='heading'>
-      <h1>Our locations</h1>
+      <h1>Accident Locations</h1>
     </div>
     <div id='listings' class='listings'></div>
   </div>
   <div id='map' class='map'> </div>
   <script>
   L.mapbox.accessToken = 'pk.eyJ1IjoicGhpbGxpcGljdCIsImEiOiJjaXAxZmQ0MjcwMTJud2ZtNXEwY2N0aWpnIn0.vhEWdSE3beiaOrchLzWvvw';
+
+
+
+   function dolocale(locale) {
+
+       // Shorten locale.feature.properties to just `prop` so we're not
+       // writing this long form over and over again.
+       var prop = locale.feature.properties;
+
+       // Each marker on the map.
+       var popup = '<h3>Accident</h3><div>' + prop.address;
+
+       var listing = listings.appendChild(document.createElement('div'));
+       listing.className = 'item';
+
+       var link = listing.appendChild(document.createElement('a'));
+       link.href = '#';
+       link.className = 'title';
+
+       link.innerHTML = prop.address;
+       if (prop.crossStreet) {
+         link.innerHTML += '<br /><small class="quiet">' + prop.crossStreet + '</small>';
+         popup += '<br /><small class="quiet">' + prop.crossStreet + '</small>';
+       }
+
+       console.log("Parse thing: " + prop.crossStreet );
+
+       var details = listing.appendChild(document.createElement('div'));
+       details.innerHTML = prop.city;
+       if (prop.phone) {
+         details.innerHTML += ' &middot; ' + prop.phoneFormatted;
+       }
+
+       link.onclick = function() {
+         setActive(listing);
+
+         // When a menu item is clicked, animate the map to center
+         // its associated locale and open its popup.
+         map.setView(locale.getLatLng(), 16);
+         locale.openPopup();
+         return false;
+       };
+
+       // Marker interaction
+       locale.on('click', function(e) {
+         // 1. center the map on the selected marker.
+         map.panTo(locale.getLatLng());
+
+         // 2. Set active the markers associated listing.
+         setActive(listing);
+       });
+
+       popup += '</div>';
+       locale.bindPopup(popup);
+
+       locale.setIcon(L.icon({
+         iconUrl: 'redmarker.png',
+         iconSize: [56, 56],
+         iconAnchor: [28, 28],
+         popupAnchor: [0, -34]
+       }));
+
+   }
+   
+  var what = dolocale
+
+
+  var clear_json =  
+      {
+        "type": "FeatureCollection",
+        "features": [
+     ]
+}
+   
+
+  
+  var test_json =  
+      {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+            -97.244650,
+              37.737670 
+              ]
+            },
+            "properties": {
+              "phoneFormatted": "(316) 555-7336",
+              "phone": "2022347336",
+              "address": "29th St E and N Rock Rd",
+              "city": "Wichita",
+              "country": "United States",
+              "crossStreet": "at 29th St N",
+              "postalCode": "67226",
+              "state": "KS",
+              "time": "2016-06-03T22:00:00Z"
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+            -97.298983,
+            37.717541
+               ]
+            },
+            "properties": {
+              "phoneFormatted": "(316) 555-7336",
+              "phone": "2025078357",
+              "address": "18th St N and Hillside",
+              "city": "Wichita",
+              "country": "United States",
+              "crossStreet": "at 18th St N",
+              "postalCode": "67226",
+              "state": "KS",
+              "time": "2016-06-01T13:05:12Z"
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+            -97.341937,
+              37.685814 
+              ]
+            },
+            "properties": {
+              "phoneFormatted": "(316) 555-7336",
+              "phone": "2023879338",
+              "address": "225 W Douglas Ave",
+              "city": "Wichita",
+              "country": "United States",
+              "crossStreet": "at Waco",
+              "postalCode": "67202",
+              "state": "KS",
+              "time": "2016-06-31T08:15:12Z"
+            }
+          }
+     ]
+}
+
+
+
+  
+   var test_json1 =  
+      {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+            -97.254650,
+              37.637670 
+              ]
+            },
+            "properties": {
+              "phoneFormatted": "(316) 555-7336",
+              "phone": "2022347336",
+              "address": "29th St E and N Rock Rd",
+              "city": "Wichita",
+              "country": "United States",
+              "crossStreet": "at 29th St N",
+              "postalCode": "67226",
+              "state": "KS",
+              "time": "2016-06-03T22:00:00Z"
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+            -97.228983,
+            37.797541
+               ]
+            },
+            "properties": {
+              "phoneFormatted": "(316) 555-8357",
+              "phone": "2025078357",
+              "address": " N Wichita",
+              "city": "Wichita",
+              "country": "United States",
+              "crossStreet": "at 18th St N",
+              "postalCode": "67226",
+              "state": "KS",
+    "time": "2016-06-01T13:05:12Z"
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+            -97.311937,
+              37.695814 
+              ]
+            },
+            "properties": {
+              "phoneFormatted": "(316) 555-9338",
+              "phone": "2023879338",
+              "address": "525 Main Ave",
+              "city": "Wichita",
+              "country": "United States",
+              "crossStreet": "at Waco",
+              "postalCode": "67202",
+              "state": "KS",
+    "time": "2016-06-31T08:15:12Z"
+            }
+          }
+     ]
+}
+
+
+
+
   var geojson = [
       {
         "type": "FeatureCollection",
@@ -384,15 +686,68 @@
         ]
       }
   ];
-  var map = L.mapbox.map('map', 'mapbox.k8xv42t9')
-  .setView([38.909671288923, -77.034084142948], 16);
 
-  map.scrollWheelZoom.disable();
+
+   var json_count = 0;
+
+   function get_json() 
+   {
+      var json_mod = json_count % 2;
+      json_count=json_count+1;
+      if( json_mod == 0 )
+      {
+         console.log("Return json0");
+         return test_json;
+      }
+      else if( json_mod == 1 )
+      {
+         console.log("Return json1");
+         return test_json1;
+      }
+   }
+
+
+  var map = L.mapbox.map('map', 'mapbox.k8xv42t9')
+  .setView([ 37.717541, -97.298983 ], 11);
+
+  //map.scrollWheelZoom.disable();
 
   var listings = document.getElementById('listings');
   var locations = L.mapbox.featureLayer().addTo(map);
 
-  locations.setGeoJSON(geojson);
+  //locations.setGeoJSON(test_json);
+  locations.setGeoJSON(test_json);
+
+  function submit() {
+
+    console.log("SUBMIT");
+
+    var myNode = document.getElementById("listings");
+    while (myNode.firstChild) {
+       myNode.removeChild(myNode.firstChild);
+    }
+
+    var myjson =  get_json(); 
+    locations.setGeoJSON(myjson);
+    locations.eachLayer(dolocale);
+
+
+  }
+
+  function clearme() {
+
+    console.log("Clear");
+
+    var myNode = document.getElementById("listings");
+    while (myNode.firstChild) {
+       myNode.removeChild(myNode.firstChild);
+    }
+
+    locations.setGeoJSON(clear_json);
+    locations.eachLayer(dolocale);
+
+  }
+
 
   function setActive(el) {
     var siblings = listings.getElementsByTagName('div');
@@ -404,64 +759,7 @@
     el.className += ' active';
   }
 
-  locations.eachLayer(function(locale) {
-
-    // Shorten locale.feature.properties to just `prop` so we're not
-    // writing this long form over and over again.
-    var prop = locale.feature.properties;
-
-    // Each marker on the map.
-    var popup = '<h3>Sweetgreen</h3><div>' + prop.address;
-
-    var listing = listings.appendChild(document.createElement('div'));
-    listing.className = 'item';
-
-    var link = listing.appendChild(document.createElement('a'));
-    link.href = '#';
-    link.className = 'title';
-
-    link.innerHTML = prop.address;
-    if (prop.crossStreet) {
-      link.innerHTML += '<br /><small class="quiet">' + prop.crossStreet + '</small>';
-      popup += '<br /><small class="quiet">' + prop.crossStreet + '</small>';
-    }
-
-    var details = listing.appendChild(document.createElement('div'));
-    details.innerHTML = prop.city;
-    if (prop.phone) {
-      details.innerHTML += ' &middot; ' + prop.phoneFormatted;
-    }
-
-    link.onclick = function() {
-      setActive(listing);
-
-      // When a menu item is clicked, animate the map to center
-      // its associated locale and open its popup.
-      map.setView(locale.getLatLng(), 16);
-      locale.openPopup();
-      return false;
-    };
-
-    // Marker interaction
-    locale.on('click', function(e) {
-      // 1. center the map on the selected marker.
-      map.panTo(locale.getLatLng());
-
-      // 2. Set active the markers associated listing.
-      setActive(listing);
-    });
-
-    popup += '</div>';
-    locale.bindPopup(popup);
-
-    locale.setIcon(L.icon({
-      iconUrl: 'marker.png',
-      iconSize: [56, 56],
-      iconAnchor: [28, 28],
-      popupAnchor: [0, -34]
-    }));
-
-});
+  locations.eachLayer(dolocale);
 </script>
 </body>
 </html>
