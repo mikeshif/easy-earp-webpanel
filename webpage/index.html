@@ -255,6 +255,10 @@
          details.innerHTML += ' &middot; ' + prop.phoneFormatted;
        }
 
+       var detail1 = listing.appendChild(document.createElement('div'));
+       detail1.innerHTML = prop.time;
+
+
        link.onclick = function() {
          setActive(listing);
 
@@ -387,13 +391,13 @@
             "properties": {
               "phoneFormatted": "(316) 555-7336",
               "phone": "2022347336",
-              "address": "29th St E and N Rock Rd",
+              "address": "3202 W St Louis St",
               "city": "Wichita",
               "country": "United States",
-              "crossStreet": "at 29th St N",
-              "postalCode": "67226",
+              "crossStreet": "at W St Louis",
+              "postalCode": "67203",
               "state": "KS",
-              "time": "2016-06-03T22:00:00Z"
+              "time": "2016-06-03T17:20:00Z"
             }
           },
           {
@@ -401,20 +405,41 @@
             "geometry": {
               "type": "Point",
               "coordinates": [
-            -97.228983,
-            37.797541
+            -97.370763,
+              37.637791 
+              ]
+            },
+            "properties": {
+              "phoneFormatted": "(316) 555-7336",
+              "phone": "2022347336",
+              "address": "2310 W Sunnybrook",
+              "city": "Wichita",
+              "country": "United States",
+              "crossStreet": "at W Sunnybrook",
+              "postalCode": "67203",
+              "state": "KS",
+              "time": "2016-06-03T13:20:00Z"
+            }
+          },
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+            -97.336435,
+            37.743367
                ]
             },
             "properties": {
               "phoneFormatted": "(316) 555-8357",
               "phone": "2025078357",
-              "address": " N Wichita",
+              "address": "3303 N Broadway",
               "city": "Wichita",
               "country": "United States",
-              "crossStreet": "at 18th St N",
+              "crossStreet": "at N Broadway",
               "postalCode": "67226",
               "state": "KS",
-    "time": "2016-06-01T13:05:12Z"
+              "time": "2016-06-01T13:05:12Z"
             }
           },
           {
@@ -432,10 +457,10 @@
               "address": "525 Main Ave",
               "city": "Wichita",
               "country": "United States",
-              "crossStreet": "at Waco",
+              "crossStreet": "at Main Ave",
               "postalCode": "67202",
               "state": "KS",
-    "time": "2016-06-31T08:15:12Z"
+              "time": "2016-06-31T08:15:12Z"
             }
           }
      ]
@@ -715,8 +740,6 @@
   var listings = document.getElementById('listings');
   var locations = L.mapbox.featureLayer().addTo(map);
 
-  //locations.setGeoJSON(test_json);
-  locations.setGeoJSON(test_json);
 
   function submit() {
 
@@ -727,10 +750,10 @@
        myNode.removeChild(myNode.firstChild);
     }
 
-    var myjson =  get_json(); 
-    locations.setGeoJSON(myjson);
-    locations.eachLayer(dolocale);
-
+    //var myjson =  get_json(); 
+    //locations.setGeoJSON(myjson);
+    //locations.eachLayer(dolocale);
+    loadJSON();
 
   }
 
@@ -759,7 +782,18 @@
     el.className += ' active';
   }
 
-  locations.eachLayer(dolocale);
+  function loadJSON() {
+
+     var myjson =  get_json(); 
+     locations.setGeoJSON(myjson);
+     locations.eachLayer(dolocale);
+
+  }
+
+
+   loadJSON();
+
+
 </script>
 </body>
 </html>
